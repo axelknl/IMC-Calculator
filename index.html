@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>BMI Calculator</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/835da4a40a.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <section id="gender" class="gender">
+            <div class="container">
+                <h3 class="title">Gender</h3>
+                <div class="gender__choice">
+                    <img id="genderIcon" src="assets/girlAvatar.png" alt="gender">
+                </div>
+                <div class="gender__button">
+                    <a onclick="selectG('g')" id="girlButton" class="girl__button">Female</a>
+                    <a onclick="selectG('m')" id="menButton" class="men__button">Male</a>
+                </div>
+                <div class="gender__arrow arrow">
+                    <i id="toCalc" onclick="changePage('calcul')" class="fas fa-arrow-circle-right fa-4x"></i>
+                </div>
+            </div>
+        </section>
+        <section id="calcul" class="calcul">
+            <div class="container">
+                <h3 class="title">Info</h3>
+                <div class="gender__choice">
+                    <img id="genderIcon2" src="assets/girlAvatar.png" alt="gender">
+                </div>
+                <div class="data__select">
+                    <div class="data__item age">
+                        <h3>Age</h3>
+                        <span id="dAge"></span>
+                        <input type="range" id="sAge" name="age" min="0" max="90">
+                    </div>
+                    <div class="data__item height">
+                        <h3>Height</h3>
+                        <span id="dHeight"></span>
+                        <input type="range" id="sHeight" name="height" min="30" max="99">
+                    </div>
+                    <div class="data__item Weight">
+                        <h3>Weight</h3>
+                        <span id="dWeight"></span>
+                        <input type="range" id="sWeight" name="weight" min="45" max="150">
+                    </div>
+                </div>
+                <div class="gender__arrow arrow">
+                    <i onclick="changePage('result')" class="fas fa-arrow-circle-right fa-4x"></i>
+                </div>
+            </div>
+        </section>
+        <section id="result" class="result">
+            <div class="container">
+                <h3 class="title">Your BMI is:</h3>
+                <div class="bmi">
+                    <div class="bmi__result">
+                        <svg class="progress-ring" height="220" width="220">
+                            <text x="61" y="135"
+                                        font-family="Verdana"
+                                        font-size="80"
+                                        id="bmiDisplay">
+                                    </text>
+                            <circle id="pcBmi" class="progress-ring__circle pr__home" stroke="black" stroke-width="10" fill="transparent" r="90" cx="110" cy="110" />
+                        </svg>
+                    </div>
+                    <div class="legend">
+                        <div class="item">
+                            <i class="fas fa-circle fa-lg green"></i>
+                            <p>20 - 24.9</p>
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-circle fa-lg yellow"></i>
+                            <p>25 - 29.9</p>
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-circle fa-lg lred"></i>
+                            <p>30 - 39.9</p>
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-circle fa-lg red"></i>
+                            <p>> 40</p>
+                        </div>
+                    </div>
+                    <h4 id="overOrNot"></h4>
+                    <p id="descWeight"></p>
+                    <a onclick="changePage('restart')" class="restart">Calculate Again</a>
+                </div>
+            </div>
+        </section>
+        <script>
+            localStorage.setItem("bmiGender","girl")
+
+        function selectG(gender) {
+            const bGirl = document.getElementById("girlButton");
+            const bMen = document.getElementById("menButton");
+            const img = document.getElementById("genderIcon");
+            if (gender == "g") {
+                bGirl.style.backgroundColor = "#fcd336";
+                bMen.style.backgroundColor = "#f7f7f7";
+                img.setAttribute("src", "assets/girlAvatar.png");
+                localStorage.setItem("bmiGender","girl")
+            } else {
+                bGirl.style.backgroundColor = "#f7f7f7";
+                bMen.style.backgroundColor = "#fcd336";
+                img.setAttribute("src", "assets/menAvatar.png");
+                localStorage.setItem("bmiGender","men")
+            }
+        }
+        function loadImageCalc() {
+            const pic = document.getElementById("genderIcon2");
+            const img = localStorage.getItem("bmiGender");
+            if (img == "girl") {
+                pic.setAttribute("src", "assets/girlAvatar.png");
+            } else {
+                pic.setAttribute("src", "assets/menAvatar.png");
+            }
+        }
+
+        var circle = document.querySelector("circle");
+        var radius = circle.r.baseVal.value;
+        var circumference = radius * 2 * Math.PI;
+
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = `${circumference}`;
+
+        function loadRes() {
+            var height = localStorage.getItem("bmiHeight");
+            var weight = localStorage.getItem("bmiWeight");
+            var score = parseInt(weight / (height * height));
+            var kgLost = weight;
+            if (score >= 25) {
+                var nscore = score;
+                while (nscore >= 25) {
+                    weight = weight - 1;
+                    nscore = parseInt(weight / (height * height));
+                }
+            }
+            kgLost = kgLost - weight;
+            document.getElementById("bmiDisplay").innerHTML = score;
+            if (score <= 24.9) {
+                document.getElementById("bmiDisplay").style.color = "#64dd17";
+                document.getElementById("overOrNot").innerHTML = "Your weight is good"
+                document.getElementById("overOrNot").style.color = "#64dd17";
+                document.getElementById("descWeight").innerHTML = "You don't need to lose weight";
+                document.getElementById("descWeight").style.color = "black";
+                document.getElementById("pcBmi").style.stroke = "#64dd17";
+                setProgress(score);
+            } else if (score >= 25 && score <= 29.9 ){
+                document.getElementById("bmiDisplay").style.color = "#fcd336";
+                document.getElementById("overOrNot").innerHTML = "You are overweighted"
+                document.getElementById("overOrNot").style.color = "#fcd336";
+                document.getElementById("descWeight").innerHTML = "You need to lose " + kgLost + " kg to have a good BMI.";
+                document.getElementById("descWeight").style.color = "black";
+                document.getElementById("pcBmi").style.stroke = "#fcd336";
+                setProgress(score);
+            } else if (score >= 30 && score <= 39.9){
+                document.getElementById("bmiDisplay").style.color = "#ef5350";
+                document.getElementById("overOrNot").innerHTML = "You are overweighted"
+                document.getElementById("overOrNot").style.color = "#ef5350";
+                document.getElementById("descWeight").innerHTML = "You need to lose " + kgLost + " kg to have a good BMI.";
+                document.getElementById("descWeight").style.color = "black";
+                document.getElementById("pcBmi").style.stroke = "#ef5350";
+                setProgress(score);
+            } else if (score >= 40) {
+                document.getElementById("bmiDisplay").style.color = "#b61827";
+                document.getElementById("overOrNot").innerHTML = "You are too overweighted"
+                document.getElementById("overOrNot").style.color = "#b61827";
+                document.getElementById("descWeight").innerHTML = "You need to lose " + kgLost + " kg to have a good BMI.";
+                document.getElementById("descWeight").style.color = "black";
+                document.getElementById("pcBmi").style.stroke = "#b61827";
+                setProgress(score);
+            }
+        }
+
+        function setProgress(percent) {
+                if (percent >= 50) {
+                    percent = 50;
+                }
+                const offset = circumference - percent / 100 * circumference;
+                circle.style.strokeDashoffset = offset;
+                }
+
+        function changePage(want) {
+            sectionG = document.getElementById("gender");
+            sectionC = document.getElementById("calcul");
+            sectionR = document.getElementById("result");
+            if (want == "calcul") {
+                sectionG.style.display = "none";
+                sectionC.style.display = "block";
+                sectionR.style.display = "none";
+                loadImageCalc();
+            } else if (want == "result") {
+                sectionG.style.display = "none";
+                sectionC.style.display = "none";
+                sectionR.style.display = "block";
+                localStorage.setItem("bmiAge",dAge.innerHTML)
+                localStorage.setItem("bmiHeight",dHeight.innerHTML)
+                localStorage.setItem("bmiWeight",dWeight.innerHTML)
+                loadRes();
+            } else if (want == "restart") {
+                sectionG.style.display = "block";
+                sectionC.style.display = "none";
+                sectionR.style.display = "none";
+                localStorage.clear();
+            }
+        }
+
+        var dAge = document.getElementById("dAge");
+        var dHeight = document.getElementById("dHeight");
+        var dWeight = document.getElementById("dWeight");
+        dAge.innerHTML = document.getElementById("sAge").value;
+        dHeight.innerHTML = "1." + document.getElementById("sHeight").value;
+        dWeight.innerHTML = document.getElementById("sWeight").value;
+
+        var sAge = document.getElementById("sAge");
+        var sHeight = document.getElementById("sHeight");
+        var sWeight = document.getElementById("sWeight");
+
+        sAge.addEventListener("input", function() {
+            dAge.innerHTML = sAge.value;
+        }, false);
+        
+        
+        sHeight.addEventListener("input", function() {
+            dHeight.innerHTML = "1." + sHeight.value;
+        }, false); 
+
+        
+        sWeight.addEventListener("input", function() {
+            dWeight.innerHTML = sWeight.value;
+        }, false); 
+
+
+
+
+        </script>
+    </body>
+</html>
